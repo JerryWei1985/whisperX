@@ -1,6 +1,7 @@
 import hashlib
 import os
 import urllib
+import logging
 from typing import Callable, Optional, Text, Union
 
 import numpy as np
@@ -16,6 +17,8 @@ from tqdm import tqdm
 from .diarize import Segment as SegmentX
 
 VAD_SEGMENTATION_URL = "https://whisperx.s3.eu-west-2.amazonaws.com/model_weights/segmentation/0b5b3216d60a2d32fc086b47ea8c67589aaeb26b7e07fcbe620d6d0b83e209ea/pytorch_model.bin"
+
+logger = logging.getLogger(__name__)
 
 def load_vad_model(device, vad_onset=0.500, vad_offset=0.363, use_auth_token=None, model_fp=None):
     model_dir = torch.hub._get_torch_home()
@@ -283,7 +286,7 @@ def merge_chunks(
         segments_list.append(SegmentX(speech_turn.start, speech_turn.end, "UNKNOWN"))
 
     if len(segments_list) == 0:
-        print("No active speech found in audio")
+        logger.debug("No active speech found in audio")
         return []
     # assert segments_list, "segments_list is empty."
     # Make sur the starting point is the start of the segment.
